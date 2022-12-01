@@ -1,5 +1,5 @@
 # AoC-2022
-Adventure of Code 2022
+Advent of Code 2022
 
 Quick and dirty solutions to AoC 2022 in Rust.
 
