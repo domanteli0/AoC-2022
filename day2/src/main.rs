@@ -63,6 +63,9 @@ impl FromStr for Hand {
     }    
 }
 
+// X means you need to lose, 
+// Y means you need to end the round in a draw,
+//  and Z means you need to win. Good luck!"
 
 
 fn main() {    
@@ -77,11 +80,31 @@ fn main() {
         let pair: (Hand, Hand) = {
             let pair = str.split(' ');
             let mut it = pair.into_iter().into_iter();
-            
-            (
-                it.next().expect("no next found").parse::<Hand>().expect("failed to parse"), 
-                it.next().expect("no next found").parse::<Hand>().expect("failed to parse"), 
-            )
+
+            let fst = it.next().expect("no next found").parse::<Hand>().expect("failed to parse");
+            let snd: Hand = match fst {
+                Hand::Rock => match it.next().expect("no next found") {
+                    "X" => Hand::Scissors,
+                    "Y" => Hand::Rock,
+                    "Z" => Hand::Paper,
+                    _ => panic!("unexpected symbol in second pair")
+                },
+                Hand::Paper => match it.next().expect("no next found") {
+                    "X" => Hand::Rock,
+                    "Y" => Hand::Paper,
+                    "Z" => Hand::Scissors,
+                    _ => panic!("unexpected symbol in second pair")
+                }
+                Hand::Scissors => match it.next().expect("no next found") {
+                    "X" => Hand::Paper,
+                    "Y" => Hand::Scissors,
+                    "Z" => Hand::Rock,
+                    _ => panic!("unexpected symbol in second pair")
+                }
+            };
+
+            (fst, snd)
+
         };
 
         println!("{pair:?}");
