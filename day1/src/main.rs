@@ -1,6 +1,5 @@
 use std::fs;
 
-// fn main() -> Result<(), Error> 
 fn main()
 {
     let str = fs::read_to_string("input.txt")
