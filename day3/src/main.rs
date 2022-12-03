@@ -6,22 +6,55 @@ fn main() {
 
     let mut common: Vec<char> = Vec::new();
 
-    for str in strs.split('\n').into_iter()
+    let mut str = strs.split('\n');
+
+    let count = str.clone().count() / 3;
+    let mut ix = 0;
+
+    let mut groups: Vec<(&str, &str, &str)> = Vec::new();
+
+    while ix < count
     {
-        let (fst, snd) = str.split_at(str.len() / 2);
-        println!("first: {fst}, second: {snd}");
-
-        let com = fst.find_common(snd);
-
-        for el in com.into_iter()
-        {
-            common.insert(0, el);
-        }
+        groups.insert(0, (
+            str.next().expect("failed to group").clone(),
+            str.next().expect("failed to group").clone(),
+            str.next().expect("failed to group").clone(),
+        ));
+        
+        ix += 1;
     }
 
+    for (o, s, p) in groups
+    {
+        let mut group_common = Vec::new();
+        println!("group: {o}, {s}, {p} ");
+        'lol: for ox in o.chars()
+        {
+            for sx in s.chars()
+            {
+                for px in p.chars()
+                {
+                    if ox == sx && px == sx && ox == px
+                    {
+                        if !group_common.contains(&ox)
+                        {
+                            group_common.insert(0, ox);
+                            continue 'lol;
+                        }
+                    }
+                }
+            }
+        }
+
+        group_common.into_iter().for_each(|gc| -> () { common.insert(0, gc); } )
+    }
+
+    common.clone().into_iter().for_each(|c| -> () {println!("common: {c}");});
+
     // let sum = 'Z'.priotity();
-    let sum = common.into_iter().fold(0, |acc: u32, x: char| -> u32 {acc + x.priotity()});
-    println!("prio: {sum}");
+    let sum = common.into_iter().fold(0, |acc, el| -> u32 {acc + el.priotity()});
+    println!("sum: {sum}");
+    
 }
 
 impl Priority for char {
