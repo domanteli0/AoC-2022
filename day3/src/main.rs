@@ -1,4 +1,4 @@
-use std::{fs, collections::HashMap};
+use std::{fs};
 
 fn main() {
     let strs = fs::read_to_string("input.txt")
