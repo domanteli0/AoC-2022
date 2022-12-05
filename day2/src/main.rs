@@ -1,4 +1,4 @@
-use std::{fs, cmp::Ordering, str::FromStr, error::Error, string::ParseError, char::ParseCharError};
+use std::{fs, cmp::Ordering, str::FromStr};
 
 // "The first column is what your opponent is going to play: 
 // A for Rock, 

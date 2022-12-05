@@ -103,11 +103,15 @@ trait Move
 impl Move for Vec<VecDeque<char>> {
     fn move_crate(&mut self, src: usize, dst: usize, times: usize)
     {
+        let mut temp = Vec::new();
         for _ in 0..times
         {
-            let item = self[src - 1].pop_front().unwrap();
-            self[dst - 1].push_front(item);
+            temp.insert(0, self[src - 1].pop_front().unwrap());
         }
+
+        temp.iter().for_each(
+            |el| self[dst - 1].push_front(*el)
+        );
     }
 }
 
