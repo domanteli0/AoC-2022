@@ -284,21 +284,36 @@ fn main()
         }
     }
 
-    print_fs(&repo, &root_id);
+    // print_fs(&repo, &root_id);
     let root_size = repo.get(&root_id).unwrap().size(&repo);
-    println!("root size: {}", root_size);
+    // println!("root size: {}", root_size);
 
-    let mut accum = { if root_size > 100_000 { 0 } else { root_size }};
+    // let mut accum = { if root_size > 100_000 { 0 } else { root_size }};
     // let accum = 0;
+    let space_needed = 30_000_000;
+    let space_total = 70_000_000;
+    let space_unused = space_total - root_size;
+    let space_to_delete = space_needed - space_unused;
+
+    let mut folders = Vec::new();
     for (_, item) in repo.clone()
     {
-        if item.is_folder() && item.size(&repo) <= 100_000
+        if item.is_folder()
         {
-            accum += item.size(&repo);
+            folders.push((item.name, item.size(&repo)));
         }
     }
+    folders.sort_by(|(_, a), (_, b)| a.cmp(b));
 
-    println!("Total: {accum}");
+    println!("Root size: {root_size}");
+    println!("Space to delete: {space_to_delete}");
+    println!("Total: {folders:?}");
+    println!("Folder to delete: {:?}", 
+        folders
+            .into_iter()
+            .find(|(_, e)| *e >= space_to_delete)
+    );
+    // wrong guess: 'lhjmzsl'
 }
 
 fn print_fs(repo: &HashMap<GUID, Node>, root_id: &GUID)
