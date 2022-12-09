@@ -24,7 +24,9 @@ fn main() {
         println!("row: {row:?}");
     }
 
-    let mut visibles = Vec::new();
+    dbg!(is_visible(&mtrx, 1,2));
+
+    let mut scores = Vec::new();
     
     let (rows, cols) = mtrx.dimensions();
 
@@ -32,100 +34,114 @@ fn main() {
     {
         for y in 0..cols
         {
-            visibles.push(mtrx.is_visible(x, y));
+            scores.push(is_visible(&mtrx, x, y));
         }
     }
 
-    println!("count: {}", visibles.into_iter().filter(|b| *b).count());
+    println!("max: {:?}", scores.into_iter().max());
+
+    // println!("count: {}", visibles.into_iter().filter(|b| *b).count());
 
     // println!("x_len: {x_len}, y_len: {y_len}, mtrx: {mtrx:?}");
 }
 
-trait IsVisible {
-    fn is_visible(&self, x: usize, y: usize) -> bool;   
-}
+// trait IsVisible {
+//     fn is_visible(&self, x: usize, y: usize) -> u32;   
+// }
 
-impl<T> IsVisible for Compressed<T> 
-where T: matrix::Element + Ord + Copy + Debug
+fn is_visible(mtrx: &Compressed<u32>, x: usize, y: usize) -> u32
 {
-    fn is_visible(&self, x: usize, y: usize) -> bool {
-        let (x_max, y_max) = self.dimensions();
-        if x == 0 || y == 0 || (x + 1) == x_max || (y + 1) == y_max
-        {
-            return true;
-        } 
 
-        let hight = dbg!(self.get((x, y)));
+    let (x_max, y_max) = mtrx.dimensions();
+    // if x == 0 || y == 0 || (x + 1) == x_max || (y + 1) == y_max
+    // {
+    //     return true;
+    // } 
 
-        let mut left: Vec<_> = Vec::new();
-        let mut right: Vec<_> =  Vec::new();
-        let mut bottom: Vec<_> =  Vec::new();
-        let mut top: Vec<_> =  Vec::new();
+    let hight = dbg!(mtrx.get((x, y)));
 
-        for ix in 0..x
-        {
-            top.push(self.get((ix, y)));
-        }
+    let mut left: Vec<_> = Vec::new();
+    let mut right: Vec<_> =  Vec::new();
+    let mut bottom: Vec<_> =  Vec::new();
+    let mut top: Vec<_> =  Vec::new();
 
-        for ix in (x + 1)..x_max
-        {
-            bottom.push(self.get((ix, y)));
-        }
-
-        for jx in 0..y
-        {
-            left.push(dbg!(self.get((x, jx))));
-        }
-
-        for jx in (y + 1)..y_max
-        {
-            right.push(self.get((x, jx)));
-        }
-
-        println!("left: {left:?}");
-        println!("right: {right:?}");
-        println!("top: {top:?}");
-        println!("bottom: {bottom:?}");
-
-        // let mut is_visible = true;
-        // loop {
-            if top.into_iter().any(|el| el >= hight)
-            {
-                println!("top invisible");
-                // is_visible = false;
-            } else { return true; }
-            
-            if bottom.into_iter().any(|el| el >= hight)
-            {
-                println!("bottom invisible");
-                // return true;
-            } else { return true; }
-            
-            if left.into_iter().any(|el| el >= hight)
-            {
-                println!("left invisible");
-                // return true;
-            } else { return true; }
-            
-            if right.into_iter().any(|el| el >= hight)
-            {
-                println!("right invisible");
-                // return true;
-            } else { return true; }
-
-            // break;
-        // }
-
-
-        // for ix in 0..x_max
-        // {
-        //     for jy in 0..y_max
-        //     {
-        //         if (self.get(ix, jy) )
-        //     }
-        // }
-
-        // todo!()
-        false
+    for ix in (0..x).rev()
+    {
+        top.push(mtrx.get((ix, y)));
     }
-}
+
+    for ix in (x + 1)..x_max
+    {
+        bottom.push(mtrx.get((ix, y)));
+    }
+
+    for jx in (0..y).rev()
+    {
+        left.push(dbg!(mtrx.get((x, jx))));
+    }
+
+    for jx in (y + 1)..y_max
+    {
+        right.push(mtrx.get((x, jx)));
+    }
+
+    println!("left: {left:?}");
+    println!("right: {right:?}");
+    println!("top: {top:?}");
+    println!("bottom: {bottom:?}");
+
+    let top_score = 
+        (top).clone()
+        .into_iter()
+        .take_while(|el| (*el) < hight)
+        .chain(
+            top.clone()
+            .into_iter()
+            .skip_while(|el| (*el) < hight)
+            .take(1)
+        )
+        .count();
+    
+    let bottom_score = 
+        (bottom).clone()
+        .into_iter()
+        .take_while(|el| (*el) < hight)
+        .chain(
+            bottom.clone()
+            .into_iter()
+            .skip_while(|el| (*el) < hight)
+            .take(1)
+        )
+        .count();
+
+    let right_score = 
+        (right).clone()
+        .into_iter()
+        .take_while(|el| (*el) < hight)
+        .chain(
+            right.clone()
+            .into_iter()
+            .skip_while(|el| (*el) < hight)
+            .take(1)
+        )
+        .count();
+
+    let left_score = 
+        (left).clone()
+        .into_iter()
+        .take_while(|el| (*el) < hight)
+        .chain(
+            left.clone()
+            .into_iter()
+            .skip_while(|el| (*el) < hight)
+            .take(1)
+        )
+        .count();
+    
+    println!("top_score: {top_score:?}");
+    println!("bottom_score: {bottom_score:?}");
+    println!("left_score: {left_score:?}");
+    println!("right_score: {right_score:?}");
+    
+    (top_score * bottom_score * left_score * right_score) as u32
+} 
