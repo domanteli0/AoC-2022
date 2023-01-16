@@ -30,9 +30,9 @@ fn main() {
                     '*' => const_or_id(monkeys[m_ix].op_arg1.clone())(i) * const_or_id(monkeys[m_ix].op_arg2.clone())(i),
                     '+' => const_or_id(monkeys[m_ix].op_arg1.clone())(i) + const_or_id(monkeys[m_ix].op_arg2.clone())(i),
                     _ => unreachable!()
-                } / 3;
+                };
     
-                match new_size % (monkeys[m_ix].div_by as isize) == 0 {
+                match new_size % (monkeys[m_ix].div_by as u128) == 0 {
                     true => {
                         let index = monkeys[m_ix].if_true;
                         monkeys[index].items.push(new_size)
@@ -69,7 +69,7 @@ fn main() {
 struct Monkey
 {
     id: usize,
-    items: Vec<isize>,
+    items: Vec<u128>,
     op_arg1: String,
     op_arg2: String,
     op_ch: char,
@@ -104,14 +104,14 @@ impl FromStr for Monkey {
         let div_by = parse_div_by(iter.next().unwrap()).finish().unwrap().1;
 
         Ok(Monkey { 
-            id, 
+            id: id as _, 
             items: starting_items,
-            div_by,
+            div_by: div_by as _,
             op_arg1,
             op_arg2,
             op_ch,
-            if_true: parse_if_true(iter.next().unwrap()).unwrap().1, 
-            if_false: parse_if_false(iter.next().unwrap()).unwrap().1, 
+            if_true: parse_if_true(iter.next().unwrap()).unwrap().1 as _, 
+            if_false: parse_if_false(iter.next().unwrap()).unwrap().1 as _, 
         })
     }
 }
@@ -132,11 +132,11 @@ impl FromStr for Monkey {
 //     }
 // }
 
-fn const_or_id(s: String) -> impl Fn(isize) -> isize {
+fn const_or_id(s: String) -> impl Fn(u128) -> u128 {
     move |i| {
         match &s[..] {
             "old" => i,
-            s => s.clone().trim().parse::<isize>().unwrap()
+            s => s.clone().trim().parse::<u128>().unwrap()
         }
     }
 }
@@ -186,36 +186,36 @@ fn parse_op(s: &str) -> IResult<&str, (String, char, String)> {
     )(s)
 }
 
-fn parse_fac<'a>(s: &'a str) -> impl FnMut(&'a str) -> IResult<&str, usize> {
+fn parse_fac<'a>(s: &'a str) -> impl FnMut(&'a str) -> IResult<&str, u128> {
     map(
         preceded(tag(s), take_while(|_| true)),
-        |s: &str| s.trim().parse::<usize>().unwrap()
+        |s: &str| s.trim().parse::<u128>().unwrap()
     )
 }
 
-fn parse_div_by(s: &str) -> IResult<&str, usize> {
+fn parse_div_by(s: &str) -> IResult<&str, u128> {
     parse_fac("  Test: divisible by ")(s)
 }
 
-fn parse_if_true(s: &str) -> IResult<&str, usize> {
+fn parse_if_true(s: &str) -> IResult<&str, u128> {
  
     parse_fac("    If true: throw to monkey ")(s)
 }
-fn parse_if_false(s: &str) -> IResult<&str, usize> {
+fn parse_if_false(s: &str) -> IResult<&str, u128> {
     parse_fac("    If false: throw to monkey ")(s)
 }
 
-fn parse_starting_items(s: &str) -> IResult<&str, Vec<isize>> {
+fn parse_starting_items(s: &str) -> IResult<&str, Vec<u128>> {
 
     map(
         preceded(tag("  Starting items: "), take_till(|ch| ch == '\n')),
-        |vec: &str| -> Vec<isize> { vec.split(", ").map(|e| e.trim().parse::<isize>().unwrap()).collect::<Vec<_>>() }
+        |vec: &str| -> Vec<u128> { vec.split(", ").map(|e| e.trim().parse::<u128>().unwrap()).collect::<Vec<_>>() }
     )(s)
 }
 
-fn parse_monkey_id(s: &str) -> IResult<&str, usize> {
+fn parse_monkey_id(s: &str) -> IResult<&str, u128> {
     map(
         delimited(tag("Monkey "), take_until(":"), tag(":")),
-        |s: &str| s.parse::<usize>().unwrap()
+        |s: &str| s.parse::<u128>().unwrap()
     )(s)
 }

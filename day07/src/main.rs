@@ -122,7 +122,7 @@ fn parse_file(i: &'static str) -> IResult<&str, Item>
         return 
             map(
                 tag(",|<>!@#$%^&*("), 
-                |_| -> _ {Item::Dir("SHOULD NOT HAPPEN")}
+                |_| -> _ { unreachable!() }
             )(i);
     }
 
@@ -192,13 +192,13 @@ fn main()
     const STR: &str = include_str!("../input.txt");
     // let fst = STR.lines().next().unwrap();
     println!("{:?}", get_commands(STR));
-    // let mut root: Item;
-
     let mut iter = get_commands(STR).unwrap().into_iter();
+
+    // let mut root: Item;
     
     let mut repo: HashMap<GUID, Node> = HashMap::new(); 
 
-    let mut root: _ =
+    let mut root =
     {
         let cmd = iter.next().unwrap();
 
